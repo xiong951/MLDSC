@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}DSC Analysis Web{% endblock %}
+
+<!--Content here-->
+<style>
+    .row {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        max-width: 65rem;
+    }
+    .small-offset-1 {
+        margin-left: 8.33333% !important;
+    }
+    .small-10 {
+        width: 83.33333%;
+    }
+    .small-6 {
+        width: 50%;
+    }
+    .column, .columns {
+        position: relative;
+        padding-left: 0.9375rem;
+        padding-right: 0.9375rem;
+        float: left;
+    }
+    .large-12 {
+        width: 100%;
+    }
+    .container {
+        width: 1080px;
+    }
+    .table td {
+        text-align:center;
+        padding-top: 0.2rem;
+        padding-bottom: 0.2rem;
+    }
+    h3 {
+        text-align: left;
+    }
+    p {
+        text-align: justify;
+        font-family: Arial;
+        font-size: 20px;
+    }
+    li {
+        text-align: justify;
+    }
+</style>
+
+{% block page_content %}
+    <div class="row">
+        <br>
+        <div class="small-10 small-offset-1 columns">
+            <h3><b>MLDSC Method</b></h3>
+            <p></p>
+            <p><strong>MLDSC</strong> is a semi-supervised learning based method. The method automates the analysis of DSC signals to extract thermodynamically informative parameters. It can perform baseline estimation, peak identification, and enthalpy integration, peak deconvolution.</p>
+            <p><strong>MLDSC</strong> is we proposed a machine learning method to automate the DSC peak identification, baseline allocation, and data interpretation. The algorithm is divided into three parts: (1) The iterative polynomial
+                fitting is used to estimate the baseline. (2) An EMGM model is established to extract the signal of interest, in order to distinguish the baseline and peak signal. The probability distribution of the peak signal is further
+                used to assign the baseline. (3) The least-squares modeling of net peak signal is used to extract thermodynamic properties from the DSC data.</p>
+            <p style="margin-bottom: 0.5rem"><strong>Initial baseline generation by iterative polynomial fitting.</strong> Here, we list the analysis results of Bovine Serum Albumin (BSA) DSC data.
+        The baseline results of IPF with different powers are shown in Fig. After many experiments, we found the optimized power is 4 or 5.</p>
+            <div class="large-12 columns">
+                <!-- <img style="display:block;margin:auto;width:50%;height:auto;margin-bottom: 1rem" src="../static/figure/BSAIPF.jpg" /> -->
+                <img  src="../static/figure/BSAIPF.jpg" style="width:50%; height:auto; margin-bottom: 1rem"/>
+            </div>
+
+            <p style="margin-bottom: 0.5rem"><strong>Peak signal identification.</strong> We use the expectation maximization algorithm to optimize the likelihood of the EMGM model. This algorithm can calculate the expected value of E(zi), which is a continuous value on the interval [0,1].
+                To find a solution with a small noise variance, we add a semi-normal before σ to regularize the optimization of parameters. The variance of the prior distribution σ2 =0.02 can be used to control the intensity of regularization.
+                The results of Bovine Serum Albumin (BSA) data analysis are shown in the figure below.
+                Fig.(a) is the raw data of the BSA DSC experiment. Fig.(b) shows the probability distribution of DSC signal’s data. If the data point’s probability signal is higher than the 0.5, it is categorized as the peak signal.
+                The identified net peak signal area is shown in Fig.(c).</p>
+
+            <div class="large-12 columns">
+                <img style="display:block;margin:auto;width:100%;height:auto;margin-bottom: 1rem" src="../static/figure/BSAPeakSignalIdentification.png" />
+            </div>
+
+            <p style="margin-bottom: 0.5rem"><strong>Peak signal analysis.</strong> We fit the net peak signal using a normal distribution to extract thermodynamic parameters.</p>
+            <div class="large-12 columns">
+                <img style="display:block;margin:auto;width:100%;height:auto;margin-bottom: 1rem" src="../static/figure/BSA-results.png" />
+            </div>
+        </div>
+
+        <br/>
+
+        <p><strong>More details can be found in our paper.</strong></p>
+    </div>
+{% endblock %}

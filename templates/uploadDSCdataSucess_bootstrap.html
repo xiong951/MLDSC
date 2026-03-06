@@ -1,0 +1,21 @@
+{# File upload successful interface display and user data analysis #}
+
+{% extends "base.html" %}
+
+{% block title %}DSC Analysis Web{% endblock %}
+
+{% block page_content %}
+    <h1 style="font-weight: bold; font-family: 'Black体'; font-size: 24px;">Analysis Success</h1>
+    <a href='/' style="display: inline-block; padding: 8px 15px; border: 1px solid #000; background-color: green; color: white; text-decoration: none;">Return to home page</a>
+
+    <hr/>
+
+    <h1 style="font-weight: bold; font-family: 'Black体'; font-size: 24px;">Analysis Results</h1>
+    <p>Your analysis has been completed. You can download the results below:</p>
+
+    <a href="{{download_url}}" class="btn btn-primary" download>
+        Download Results
+    </a>
+
+    <hr/>
+{% endblock %}

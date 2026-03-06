@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Batch File Processing Results{% endblock %}
+
+{% block page_content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Batch File Processing Results</h2>
+
+    <!-- Failed Files Section -->
+    <h4 class="text-danger">Successfully Processed Files</h4>
+    {% if failed_files and failed_files|length > 0 %}
+    <ul class="list-group mb-3" id="failed-files">
+        {% for file in failed_files %}
+        <li class="list-group-item list-group-item-danger">
+            <i class="fas fa-times-circle"></i> {{ file }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-muted" id="no-failed-files">No files failed during processing. All files were processed successfully!</p>
+    {% endif %}
+
+    <!-- Download Section -->
+    <div class="mt-4" id="download-section">
+        {% if download_url %}
+        <a href="{{ download_url }}" class="btn btn-success btn-lg">
+            <i class="fas fa-download"></i> Download Results
+        </a>
+        {% else %}
+        <p class="text-warning">Results are not available for download.</p>
+        {% endif %}
+    </div>
+
+    <!-- Operation Buttons -->
+    <div class="text-center mt-4">
+        <a href="/multi_file_process" class="btn btn-secondary btn-lg">
+            <i class="fas fa-redo"></i> Process More Files
+        </a>
+        <a href="/" class="btn btn-primary btn-lg">
+            <i class="fas fa-home"></i> Return to Homepage
+        </a>
+    </div>
+</div>
+
+<script>
+    // 获取任务ID
+    var taskId = "{{ task_id }}";
+
+    // 定义任务状态检查的函数
+    function checkTaskStatus() {
+        fetch(`/progress/${taskId}`)
+            .then(response => response.json())
+            .then(data => {
+                // 判断任务状态
+                if (data.status === 'completed') {
+                    // 任务完成，尝试处理下载链接和发送邮件
+                    if (data.download_url) {
+                        // 下载链接存在，自动跳转到下载页面
+                        window.location.href = data.download_url;
+                    } else {
+                        console.log('No download URL available.');
+                    }
+
+                    // 发送邮件逻辑
+                    if (data.send_email) {
+                        // 这里可以添加发送邮件的逻辑，比如通过另一个API请求
+                        fetch('/send_email', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                sender_email: data.sender_email,
+                                sender_password: data.sender_password,
+                                recipient_email: data.recipient_email
+                            })
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                console.log('Email sent successfully.');
+                            } else {
+                                console.error('Failed to send email.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error sending email:', error);
+                        });
+                    }
+                } else if (data.status === 'error') {
+                    alert("An error occurred during processing. Please try again.");
+                    window.location.href = "/multi_file_process";
+                } else {
+                    // 如果任务仍在进行中，继续检查
+                    setTimeout(checkTaskStatus, 5000); // 每5秒检查一次
+                }
+            })
+            .catch(error => {
+                console.error("Error checking task status:", error);
+            });
+    }
+
+    // 页面加载时开始检查任务状态
+    window.onload = checkTaskStatus;
+</script>
+
+{% endblock %}

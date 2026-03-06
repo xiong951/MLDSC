@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}DSC Analysis Web{% endblock %}
+
+<style>
+    /* 保持原有样式不变... */
+   .row {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        max-width: 65rem;
+    }
+   .column,.columns {
+        position: relative;
+        padding-left: 0.9375rem;
+        padding-right: 0.9375rem;
+        float: left;
+    }
+   .small-3 {
+        width: 25%;
+    }
+   .small-7 {
+        width: 58.33333%;
+    }
+   .align-justify {
+        text-align: justify;
+    }
+   .main-content {
+        display: flex;
+        align-items: flex-start;
+    }
+   .text-content {
+        width: 50%;
+        padding-right: 1rem;
+    }
+   .image-content {
+        width: 50%;
+        text-align: center;
+    }
+   .image-content img {
+        width: 30%; /* 调整图片宽度为容器的30% */
+        height: auto; /* 保持比例 */
+        display: block; /* 图片块级显示 */
+        margin: auto; /* 居中对齐 */
+        margin-bottom: 1rem; /* 图片与下方内容的间距 */
+    }
+
+    @media (max-width: 768px) {
+       .image-content img {
+            width: 40%; /* 中等屏幕调整为40% */
+        }
+    }
+
+    @media (max-width: 576px) {
+       .image-content img {
+            width: 60%; /* 小屏幕调整为60% */
+        }
+    }
+
+    /* 增强按钮样式优先级 */
+    form#form1 input[type="submit"] {
+        transform: scale(1.2);
+        background-color: #007BFF!important;
+        color: white!important;
+        border: none!important;
+        padding: 8px 20px!important;
+        border-radius: 4px!important;
+        cursor: pointer!important;
+        display: inline-block!important;
+        margin-top: 10px!important;
+        transition: all 0.3s ease!important;
+    }
+
+    form#form1 input[type="submit"]:hover {
+        background-color: #0056b3!important;
+        transform: scale(1.3)!important;
+    }
+
+    /* 调整文件选择控件大小 */
+    form#form1 input[type="file"] {
+        transform: scale(1.2);
+        margin: 15px 0;
+    }
+
+    /* 优化提示框样式 */
+   .notification {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.85);
+        color: white;
+        padding: 30px 40px;
+        text-align: center;
+        z-index: 1000;
+        display: none;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        max-width: 400px;
+        width: 90%;
+        animation: fadeIn 0.5s ease forwards;
+    }
+
+   .notification h3 {
+        margin: 0 0 15px 0;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+   .notification p {
+        margin: 0;
+        font-size: 16px;
+        opacity: 0.9;
+    }
+
+    /* 加载动画 */
+   .loader {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        margin-bottom: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #007BFF;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translate(-50%, -60%); }
+        to { opacity: 1; transform: translate(-50%, -50%); }
+    }
+
+    /* 新增：自定义Calculate ΔCp标签样式 */
+    .custom-label {
+        font-weight: bold;
+        font-size: larger;
+    }
+</style>
+
+{% block page_content %}
+<body>
+
+    <!-- 保持原有内容不变... -->
+    <div style="max-width: 100%;" class="row">
+        <div class="small-10 small-offset-1 columns" style="margin-right: auto; margin-left: auto; padding-bottom: 15px; padding-top: 15px;" align="center">
+            <h2 style="text-align: center; font-weight: bold; max-width: 1024px; color: #24262D;">MLDSC - A machine learning based method for automatic </h2>
+            <h2 style="text-align: center; font-weight: bold; max-width: 1024px; color: #24262D;">differential scanning calorimetry signal analysis</h2>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="text-content">
+            <h5 style="font-family: Arial; margin-top: 0px; margin-bottom: 0px; font-size: 20px; font-weight: 200; text-align: justify;">
+                MLDSC is a semi-supervised learning based method. The method automates the analysis of DSC signals to extract thermodynamically informative parameters. It can perform baseline estimation, peak identification, and enthalpy integration, peak deconvolution. This method requires DSC data for biomolecular information. Meanwhile, the improved DSC analysis framework accurately separates endothermic and exothermic processes by employing a dual-channel processing algorithm and investigates their thermal properties by integrating independent thermodynamic models.
+            </h5>
+        </div>
+        <div class="image-content" style="display: flex; flex-direction: row; justify-content: space-around;">
+            <img src="/static/ExpDat_2_3C_1_plot.png" alt="ExpDat_2_3C_1 plot">
+            <img src="/static/ExpDat_2_3C_1_plot2.png" alt="ExpDat_2_3C_1 plot2">
+        </div>
+    </div>
+
+    <hr/>
+
+    <h2>Upload DSC file</h2>
+    <form id="form1" method="post" action="/uploadDSCdata" enctype="multipart/form-data">
+        <div>
+            <input id="File1" type="file" name="myfile"/>  <!-- 后台代码中获取文件是通过 form 的 name 来标识的 -->
+            <br>
+
+            <!-- 添加可选框 -->
+            <input type="checkbox" id="calculateDeltaCp" name="calculateDeltaCp">
+            <label for="calculateDeltaCp" class="custom-label">Calculate ΔCp</label>
+            <br>
+            <input type="submit" value="upload" class="input button">
+        </div>
+    </form>
+
+    <!-- 提示框 HTML -->
+    <div id="notification" class="notification">
+        <div class="loader"></div>
+        <h3>Processing your data...</h3>
+        <p>DSC analysis may take several minutes. Please wait.</p>
+    </div>
+
+    <hr/>
+
+    <div class="text-center mt-3" style="margin-top: 20px;">
+        <h2 class="align-justify" style="font-weight: bold;">If you need to process multiple files in batches, please click the button below to navigate to the "Batch File Processing" interface.</h2>
+        <a href="/multi_file_process" class="btn btn-outline-primary">Batch File Processing</a>
+    </div>
+
+    <script>
+        // 获取DOM元素
+        const form = document.getElementById('form1');
+        const notification = document.getElementById('notification');
+        const fileInput = document.getElementById('File1');
+        const submitButton = form.querySelector('input[type="submit"]');
+
+        // 提交状态标志
+        let isSubmitting = false;
+
+        // 确保页面加载完成后执行
+        document.addEventListener('DOMContentLoaded', function() {
+            // 隐藏提示框
+            notification.style.display = 'none';
+
+            // 为表单添加提交事件监听器
+            form.addEventListener('submit', function(e) {
+                // 如果正在提交，阻止重复提交
+                if (isSubmitting) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // 如果没有选择文件，阻止提交并提示
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    e.preventDefault();
+                    alert('Please select a file first');
+                    return;
+                }
+
+                // 标记为正在提交
+                isSubmitting = true;
+
+                // 禁用提交按钮
+                submitButton.disabled = true;
+                submitButton.value = 'Processing...';
+
+                // 显示提示框
+                notification.style.display = 'block';
+
+                // 添加点击遮罩层关闭提示框的功能
+                notification.addEventListener('click', function() {
+                    notification.style.display = 'none';
+                });
+
+                // 防止点击提示框内容时关闭提示框
+                notification.querySelector('div').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+
+                // 设置较长的超时时间，仅用于隐藏提示框
+                setTimeout(function() {
+                    // 如果处理时间过长，允许用户重试
+                    if (isSubmitting) {
+                        notification.style.display = 'none';
+                        submitButton.disabled = false;
+                        submitButton.value = 'Upload';
+                        isSubmitting = false;
+                        alert('Processing timed out. Please try again.');
+                    }
+                }, 600000); // 10分钟后
+            });
+        });
+    </script>
+</body>
+{% endblock %}

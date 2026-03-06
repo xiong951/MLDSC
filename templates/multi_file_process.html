@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}Batch File Processing{% endblock %}
+
+{% block page_content %}
+<div class="container mt-5">
+    <h2 class="text-center">Batch file processing</h2>
+
+    <form id="file-processing-form">
+        <!-- File upload -->
+        <div class="form-group mb-3">
+            <label for="inputFiles">Upload Input Folder</label>
+            <div class="custom-file-upload">
+                <input type="file" class="form-control" id="inputFiles" name="input_files" webkitdirectory directory multiple required>
+                <span id="file-upload-status">Select Folder</span>
+            </div>
+        </div>
+
+
+        <!-- Calculate ΔCp section -->
+        <div class="form-group mb-3">
+            <p class="text-muted mb-2">Please check the box below if you wish to calculate ΔCp(Tg) and ΔCp(Tm)</p>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="calculateDcp" name="calculate_dcp">
+                <label class="form-check-label font-weight-bold" for="calculateDcp">Calculate ΔCp</label>
+            </div>
+        </div>
+
+        <!-- Sender email -->
+        <div class="form-group mb-3">
+            <label for="senderEmail">Sender Email Address (optional)</label>
+            <input type="email" class="form-control" id="senderEmail" name="sender_email" placeholder="Enter sender email address">
+        </div>
+
+        <!-- Email password -->
+        <div class="form-group mb-3">
+            <label for="emailPassword">Email Password/Authorization Code (optional)</label>
+            <input type="password" class="form-control" id="emailPassword" name="sender_password" placeholder="Enter email password or auth code">
+        </div>
+
+        <!-- Recipient email -->
+        <div class="form-group mb-3">
+            <label for="recipientEmail">Recipient Email Address (optional)</label>
+            <input type="email" class="form-control" id="recipientEmail" name="recipient_email" placeholder="Enter recipient email address">
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="btn btn-primary">Start Processing</button>
+    </form>
+
+    <!-- Progress Section -->
+    <div id="progress-section" class="mt-4" style="display: none;">
+        <h4>Processing Progress</h4>
+        <p>Task ID: <span id="task-id"></span></p>
+        <div class="progress">
+            <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">0%</div>
+        </div>
+        <p id="status-message" class="mt-2 text-info">Status: Waiting...</p>
+    </div>
+
+    <!-- Results Section -->
+    <div id="results-section" class="mt-4" style="display: none;">
+        <h2 class="text-center mb-4">Batch File Processing Results</h2>
+
+        <!-- Download Section -->
+        <div class="mt-4" id="download-section">
+            <a id="download-link" class="btn btn-success btn-lg" href="#" target="_blank" download>
+                <i class="fas fa-download"></i> Download Results
+            </a>
+        </div>
+
+        <!-- Operation Buttons -->
+        <div class="text-center mt-4">
+            <a href="/multi_file_process" class="btn btn-secondary btn-lg">
+                <i class="fas fa-redo"></i> Process More Files
+            </a>
+            <a href="/" class="btn btn-primary btn-lg">
+                <i class="fas fa-home"></i> Return to Homepage
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// 页面加载时检查是否有未完成的任务
+document.addEventListener('DOMContentLoaded', function() {
+    // 检查是否有未完成的任务
+    const taskId = sessionStorage.getItem('currentTaskId');
+    if (taskId) {
+        // 使用SSE检查任务状态
+        const eventSource = new EventSource(`/progress/stream/${taskId}`);
+        eventSource.addEventListener('message', function(event) {
+            try {
+                const progressData = JSON.parse(event.data);
+                if (progressData.status === 'completed' || progressData.status === 'error') {
+                    // 如果任务已完成或出错，移除任务ID并刷新页面
+                    sessionStorage.removeItem('currentTaskId');
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error parsing SSE message:', error);
+            }
+        });
+    }
+
+    // 自定义文件上传控件的逻辑
+    const fileInput = document.getElementById('inputFiles');
+    const fileUploadStatus = document.getElementById('file-upload-status');
+
+    fileInput.addEventListener('change', function() {
+        if (fileInput.files.length === 0) {
+            fileUploadStatus.textContent = 'No Folder Selected';
+        } else {
+            fileUploadStatus.textContent = 'Folder Selected';
+        }
+    });
+});
+
+document.getElementById('file-processing-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    // Collect form inputs
+    const inputFiles = document.getElementById('inputFiles').files;
+    const materialType = document.getElementById('materialType').value; // 获取材料类型
+    const senderEmail = document.getElementById('senderEmail').value.trim();
+    const emailPassword = document.getElementById('emailPassword').value.trim();
+    const recipientEmail = document.getElementById('recipientEmail').value.trim();
+    const calculateDcp = document.getElementById('calculateDcp').checked; // 获取计算ΔCp选项
+
+    // Validate form inputs
+    if (inputFiles.length === 0) {
+        alert('Please select input files!');
+        return;
+    }
+
+    // Reset progress UI
+    const progressBar = document.getElementById('progress-bar');
+    const statusMessage = document.getElementById('status-message');
+    const progressSection = document.getElementById('progress-section');
+    const taskIdSpan = document.getElementById('task-id');
+
+    progressBar.style.width = '0%';
+    progressBar.innerText = '0%';
+    progressBar.setAttribute('aria-valuenow', 0);
+    progressSection.style.display = 'block';
+    statusMessage.textContent = 'Status: Starting...';
+
+    // Create FormData object
+    const formData = new FormData();
+    for (let i = 0; i < inputFiles.length; i++) {
+        formData.append('input_files', inputFiles[i]);
+    }
+    formData.append('material_type', materialType); // 添加材料类型到表单数据
+    formData.append('sender_email', senderEmail);
+    formData.append('sender_password', emailPassword);
+    formData.append('recipient_email', recipientEmail);
+    formData.append('calculateDeltaCp', calculateDcp); // 添加计算ΔCp选项到表单数据
+
+    // Send POST request to backend
+    fetch('/multi_file_process', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(data => {
+                console.error('Server error:', data.error);
+                throw new Error(data.error || 'Server error');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.error) throw new Error(data.error);
+
+        const taskId = data.task_id;
+        taskIdSpan.textContent = taskId;
+
+        // 保存当前任务ID到sessionStorage
+        sessionStorage.setItem('currentTaskId', taskId);
+
+        // 使用SSE跟踪进度
+        function connectSSE() {
+            const eventSource = new EventSource(`/progress/stream/${taskId}`);
+
+            // 处理消息事件（包含进度数据）
+            eventSource.addEventListener('message', function(event) {
+                try {
+                    const progressData = JSON.parse(event.data);
+
+                    // 更新进度条
+                    const progressValue = progressData.progress || 0;
+                    progressBar.style.width = `${progressValue}%`;
+                    progressBar.setAttribute('aria-valuenow', progressValue);
+                    progressBar.innerText = `${progressValue}%`;
+
+                    // 更新状态消息
+                    statusMessage.textContent = `Status: ${progressData.status}`;
+
+                    // 如果任务完成，显示结果部分
+                    if (progressData.status === 'completed' && progressData.download_url) {
+                        const resultsSection = document.getElementById('results-section');
+                        const downloadLink = document.getElementById('download-link');
+
+                        // 设置下载链接
+                        downloadLink.href = progressData.download_url;
+
+                        // 显示结果部分
+                        resultsSection.style.display = 'block';
+
+                        // 关闭SSE连接
+                        eventSource.close();
+
+                        // 移除当前任务ID
+                        sessionStorage.removeItem('currentTaskId');
+                    } else if (progressData.status === 'error') {
+                        // 任务出错处理
+                        statusMessage.textContent = 'Status: An error occurred.';
+                        eventSource.close();
+                        sessionStorage.removeItem('currentTaskId');
+                    }
+                } catch (err) {
+                    console.error("Error parsing SSE message:", err);
+                    statusMessage.textContent = 'Status: Failed to parse server message.';
+                }
+            });
+
+            // 处理错误事件（连接问题）
+            eventSource.addEventListener('error', function(event) {
+                console.error("SSE connection error.");
+                statusMessage.textContent = 'Status: Connection error. Reconnecting...';
+                eventSource.close();
+
+                // 3秒后重连
+                setTimeout(connectSSE, 3000);
+            });
+        }
+
+        // 开始SSE连接
+        connectSSE();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        statusMessage.textContent = `Error: ${error.message}`;
+
+        // 移除当前任务ID
+        sessionStorage.removeItem('currentTaskId');
+    });
+});
+</script>
+
+<style>
+.custom-file-upload {
+    position: relative;
+    display: inline-block;
+}
+
+.custom-file-upload input[type="file"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.custom-file-upload span {
+    display: inline-block;
+    padding: 10px 12px;
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+#results-section {
+    display: none;
+}
+</style>
+{% endblock %}

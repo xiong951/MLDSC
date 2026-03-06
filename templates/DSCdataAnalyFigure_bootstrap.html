@@ -1,0 +1,49 @@
+{# Display the analysis results of the DSC signal #}
+
+{% extends "base.html" %}
+{% block title %}DSC Analysis Results{% endblock %}
+
+{% block page_content %}
+    <h2>DSC Data Analysis Results</h2>
+
+    <!-- 显示分析结果图片 -->
+    <div align="center">
+        {% for img_sub in img_stream %}
+            <img src="data:;base64,{{ img_sub }}" style="width:45%; margin:10px;" alt="Analysis Result Image"/>
+        {% endfor %}
+    </div>
+
+    <hr/>
+
+    <!-- 提供图片下载链接 -->
+    <h4>Download the Analysis Result Figures</h4>
+    <ul>
+        {% for img_sub in img_name %}
+            <li><a href='/download/figure/{{ img_sub }}' download>{{ img_sub }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <hr/>
+
+    <!-- 显示热力学参数 -->
+    <h3>Thermodynamic Parameters</h3>
+    <div align="center">
+        <table border="1" style="border-collapse: collapse; text-align: center; width: 500px;">
+            <thead>
+                <tr>
+                    <th style="padding: 8px;">Peak Temperature (℃)</th>
+                    <th style="padding: 8px;">Delta H (KJ/mol)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tem, H in results %}
+                <tr>
+                    <td style="padding: 8px;">{{ tem }}</td>
+                    <td style="padding: 8px;">{{ H }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

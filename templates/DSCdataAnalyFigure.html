@@ -1,0 +1,50 @@
+<!--{#展示线性回归的图片结果界面#}-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Show Image</title>
+</head>
+<body>
+<!--    <img style="width:180px" src="data:;base64,{{ img_stream }}">-->
+<!--     <img src="data:;base64,{{ img_stream }}">-->
+    <!-- 使用百分比。这样就会保持屏幕的50%的宽度-->
+<!--    <img src="data:;base64,{{ img_stream }}" style='width:50%'/>-->
+<!--    这个仍然没能解决 图片标题只显示一半的问题-->
+
+<!--    <div style="text-align: center; width: 500px; border: green solid 1px;">-->
+<!--    <img alt="" src="data:;base64,{{ img_stream }}" style="margin: 0 auto;" />-->
+<!--    </div>-->
+<!--<div style="text-align: center; width: 500px;height:200px; line-height:200px; border: green solid 1px;">-->
+<!--   <img alt="" src="data:;base64,{{ img_stream }}" style="display: inline-block; vertical-align: middle; width:80%;" />-->
+<!--</div>-->
+
+<!--多个图片的展示-->
+<h2>DSC data analysis results</h2>
+<div align="center">
+    <o1>
+        <li>
+            {% for img_sub in img_stream %}
+            <img src="data:;base64,{{ img_sub }}" style='width:40%'/>
+            {% endfor %}
+        </li>
+        <h4>download the analysis result figures</h4>
+        {% for img_sub in img_name %}
+        <li><a href='/download/figure/{{img_sub}}'>{{img_sub}}</a>
+            {% endfor %}
+        </li>
+    </o1>
+</div>
+
+<br>
+<div>
+    <h2>Thermodynamic parameters</h2>
+    <ol>
+        {% for tem,H in Tm, deltaH %}
+        <li> Tm:{{tem}}, ΔH:{{H}}</li>
+        {% endfor %}
+    </ol>
+</div>
+
+</body>

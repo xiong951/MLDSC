@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}DSC Analysis Web{% endblock %}
+
+<style>
+.supindex
+{
+	vertical-align:super;
+	font-size:60%;
+}
+.subindex
+{
+	vertical-align:sub;
+ 	font-size:60%;
+ }
+p {
+    text-align: justify;
+}
+li {
+    text-align: justify;
+}
+</style>
+
+{% block page_content %}
+    <h3><b>How to use MLDSC Server</b></h3>
+    <h4 class="subheader">Step 1 -  Provide a DSC file</h4>
+    <p>You can upload the DSC file, the structure will be retrieved from the DSC data, which must comply with the DSC file.</p>
+    <p>Please note that: The suffix can be <strong>"csv", "txt", "xls" or "xlsx"</strong></p>
+    <img src="../static/figure/step1-uploadFile.png" style="display:block;margin:auto;width:400px;height:auto;margin-top:1.5rem;margin-bottom:0.5rem;margin-left: 2.5rem"/>
+
+    <h4 class="subheader">Step 2 - Data normalization</h4>
+    <p>The unit of heat capacity in DSC data is <strong>KJ/mol/K.</strong> The unit format is shown in the figure below:</p>
+    <img src="../static/figure/Cp-normalized.png" style="display:block;margin:auto;width:400px;height:auto;margin-top:1.5rem;margin-bottom:0.5rem;margin-left: 2.5rem"/>
+    <p>Please input a multiple of normalized:</p>
+    <img src="../static/figure/step2-normalized.png" style="display:block;margin:auto;width:400px;height:auto;margin-top:1.5rem;margin-bottom:0.5rem;margin-left: 2.5rem"/>
+
+    <h4 class="subheader">Options - Automatic domain decomposition</h4>
+    <p>This is an optional function that <strong>separates overlapping peaks.</strong></p>
+    <p>The number of input peaks and melting temperature can be selected<strong>KJ/mol/K</strong></p>
+{#    <img src="../static/figure/step1-uploadFile.png" style="display:block;margin:auto;width:400px;height:auto;margin-top:1.5rem;margin-bottom:0.5rem;margin-left: 2.5rem"/>#}
+
+    <h4 class="subheader">Results</h4>
+    <p style="margin-bottom:0.5rem;"> The results will be displayed on this page as soon as the calculation is complete.
+        The calculation results for the example are shown below. You can download a picture of this result.</p>
+     <img src="../static/figure/step-resultShow.png" style="display:block;margin:auto;width:800px;height:auto;margin-top:1.5rem;margin-bottom:0.5rem;margin-left: 2.5rem"/>
+
+{% endblock %}

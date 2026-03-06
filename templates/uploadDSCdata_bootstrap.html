@@ -1,0 +1,59 @@
+{#Upload files and file downloads#}
+
+{% extends "base.html" %}
+
+{% block title %}DSC Analysis Web{% endblock %}
+
+{% block page_content %}
+    <div style="max-width: 100%;" class="row">
+        <div class="small-10 small-offset-1 columns" style="margin-right: auto;margin-left: auto;padding-bottom: 15px;padding-top: 15px;" align="center">
+            <h2 style="text-align: center;font-weight:bold;max-width: 1024px;color: #24262D">MLDSC - A machine learning based method for automatic </h2>
+            <h2 style="text-align: center;font-weight:bold;max-width: 1024px;color: #24262D;">differential scanning calorimetry signal analysis</h2>
+        </div>
+    </div>
+
+   <div class="row">
+        <div class="small-5 columns">
+            <br>
+            <h5 style="font-family: Arial;margin-top: 0px;margin-bottom: 0px;font-size: 20px;font-weight: 200;width: 410px;text-align:justify" align="left">DSC Machine learning</h5>
+            
+        </div>
+        <div class="small-7 columns">
+            <img src="/results/combined_dsc1-a.png" style="width: 300px;height: 80px;margin-left: 0px"/>
+            <img src="/results/combined_dsc1-b.png" style="width: 300px;height: 80px;margin-left: 0px"/>
+        </div>
+    </div>
+        
+        
+    <hr/>
+    <h2>Upload DSC file</h2>
+    <body>
+    <form id="form1" method="post" action="/uploadDSCdata" enctype="multipart/form-data">
+        <div>
+            <input id="File1" type="file" name="myfile" accept=".txt,.csv,.xls,.xlsx" required/>  <!--后台代码中获取文件是通过form的name来标识的-->
+            <br>
+            <input type="submit" value="upload" class="input button">
+        </div>
+    </form>
+
+    <h2>Download DSC file</h2>
+    <ol>
+        {% for entry in entries %}
+            <li><a href='/files/{{entry}}'>{{entry}}</a>
+        {% endfor %}
+    </ol>
+
+    <h2>DSC Analysis Example</h2>
+    <form action="/example/dsc_analysis">
+        <div>
+            <input type="submit" value="dsc data analysis example" class="input button"/>
+        </div>
+    </form>
+
+    <h2>Download example dsc data</h2>
+    <form action="/download_example_dsc_data">
+        <div>
+            <input type="submit" value="Download data" class="input button"/>
+        </div>
+    </form>
+{% endblock %}

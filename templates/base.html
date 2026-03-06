@@ -1,0 +1,71 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}DSC Analysis Web{% endblock %}
+
+<head>
+    <!-- 添加 favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='NEU.ico') }}" type="image/x-icon">
+</head>
+
+<style>
+    .row {
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 0;
+        margin-bottom: 0;
+        max-width: 65rem;
+    }
+    .small-6 {
+        width: 50%;
+    }
+    .column, .columns {
+        position: relative;
+        padding-left: 0.9375rem;
+        padding-right: 0.9375rem;
+        float: left;
+    }
+</style>
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <h2><a class="navbar-brand" href="/">MLDSC</a></h2>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li><h2><a class="navbar-brand" href="/method">Method</a></h2></li>
+                <li><h2><a class="navbar-brand" href="/help">Help</a></h2></li>
+                <li><h2><a class="navbar-brand" href="/DSCexample">Example</a></h2></li>
+                <li><h2><a class="navbar-brand" href="/contact">Contact</a></h2></li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% block page_content %}{% endblock %}
+</div>
+
+    <hr style="width: 100%;margin-bottom: 5px">
+    <div class="row" style="max-width: 100%;" align="center">
+        <div class="container">
+            <div class="small-6 column">
+                <h5 align="left" style="line-height:15.5px;margin-top: 0px"><small>School of Intelligent Sensing and Optoelectronic Engineering, Northeastern University, <br>Qinhuangdao, Hebei 066004, PR China</small></h5>
+            </div>
+            <div class="small-6 column" style="margin-bottom: 10px">
+                <a target="_blank" href="//www.neu.edu.cn/" ><img src="../static/figure/NEU.jpg" class="right" style="width:45px;height:45px;margin-right:10px"/></a>
+            </div>
+        </div>
+    </div>
+{% endblock %}

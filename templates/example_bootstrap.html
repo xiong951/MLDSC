@@ -1,0 +1,25 @@
+{#Upload files and file downloads#}
+
+{% extends "base.html" %}
+
+{% block title %}DSC Analysis Web{% endblock %}
+
+{% block page_content %}
+    <h1>Example</h1>
+    <h2>Download example dsc data</h2>
+    <form action="/download_example_dsc_data">
+        <div>
+            <input type="submit" value="Download data" class="input button"/>
+        </div>
+    </form>
+    <br>
+
+    <h2>DSC Analysis Example</h2>
+    <form action="/example/dsc_analysis">
+        <div>
+            <input type="submit" value="dsc data analysis example" class="input button"/>
+        </div>
+    </form>
+
+    
+{% endblock %}
